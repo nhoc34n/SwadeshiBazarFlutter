@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "361702234630",
+    "project_id": "swadeshibazarflutter",
+    "storage_bucket": "swadeshibazarflutter.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361702234630:android:0683d72e7dd3c87a5e0187",
+        "android_client_info": {
+          "package_name": "com.example.swadeshi_bazar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmoDZJI1aZig7mH-n3Do2ttMaldxOvk4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
