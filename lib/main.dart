@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:swadeshi_bazar/login_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:swadeshi_bazar/splash_screen.dart';
 import 'package:swadeshi_bazar/welcome_screen.dart';
+import 'package:swadeshi_bazar/login_screen.dart';
 import 'package:swadeshi_bazar/signup_screen.dart';
 import 'package:swadeshi_bazar/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  runApp(MyApp());
+  try {
+    await Firebase.initializeApp(); // Initialize Firebase
+    runApp(MyApp());
+  } catch (e) {
+    print("Error initializing Firebase: $e");
+  }
 }
 
 class MyApp extends StatelessWidget {
