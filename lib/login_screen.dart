@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -8,11 +9,14 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   String _selectedUserType = 'Farmer'; // Default selection
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false; // To show a loading indicator during login
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFEEF9EE), // Background colour
+      backgroundColor: Color(0xFFEEF9EE), // Background color
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,8 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment
-                    .center, // Centres the content horizontally
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(
                     children: [
@@ -77,8 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(
-                      width: 20), // Adds spacing between the two radio buttons
+                  SizedBox(width: 20),
                   Row(
                     children: [
                       Radio<String>(
@@ -104,6 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: 'Email',
                   prefixIcon: Icon(Icons.email, color: Color(0xFF199B33)),
@@ -123,6 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32),
               child: TextField(
+                controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: 'Password',
@@ -144,18 +149,56 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.only(right: 32),
               child: Align(
                 alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Handle login action based on selected user type
-                    print('Selected User Type: $_selectedUserType');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.all(20),
-                    backgroundColor: Color(0xFF199B33),
-                  ),
-                  child: Icon(Icons.arrow_forward, color: Colors.white),
-                ),
+                child: _isLoading
+                    ? CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Color(0xFF199B33)),
+                      )
+                    : ElevatedButton(
+                        onPressed: () async {
+                          setState(() {
+                            _isLoading = true; // Show loading indicator
+                          });
+                          try {
+                            // Attempt to sign in with Firebase
+                            UserCredential userCredential = await FirebaseAuth
+                                .instance
+                                .signInWithEmailAndPassword(
+                              email: _emailController.text,
+                              password: _passwordController.text,
+                            );
+                            // Navigate to home page after successful login
+                            Navigator.pushReplacementNamed(context, '/home');
+                          } on FirebaseAuthException catch (e) {
+                            // Handle any errors that occur during login
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Error'),
+                                content: Text(e.message ?? 'An error occurred'),
+                                actions: [
+                                  TextButton(
+                                    child: Text('OK'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          } finally {
+                            setState(() {
+                              _isLoading = false; // Hide loading indicator
+                            });
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: CircleBorder(),
+                          padding: EdgeInsets.all(20),
+                          backgroundColor: Color(0xFF199B33),
+                        ),
+                        child: Icon(Icons.arrow_forward, color: Colors.white),
+                      ),
               ),
             ),
             SizedBox(height: 16),
@@ -180,8 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
-                          Navigator.pushNamed(
-                              context, '/signup'); // Navigate to signup page
+                          Navigator.pushNamed(context, '/signup');
                         },
                     ),
                   ],
